@@ -1,0 +1,26 @@
+.card-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 20px;
+  }
+  
+
+  .row-4-cards {
+    justify-content: space-between;
+  }
+
+  .card {
+    width: calc(25% - 1rem);
+    margin-bottom: 1rem;
+}
+
+.card-img-container {
+  /*!height: 200px;*/
+  overflow: hidden;
+}
+
+.card-img-container img {
+  width: 100%;
+  height: auto;
+}
