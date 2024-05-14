@@ -4,6 +4,7 @@ import { useAuth } from "../Context/AuthContext";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Link } from "react-router-dom";
+import "./LoginRegister.css";
 
 type LoginFormsInputs = {
   userName: string;
@@ -28,15 +29,16 @@ const Login = () => {
   };
 
   return (
-    <div>
+    <div className="login-container">
       <h2>Login</h2>
-      <Form onSubmit={handleSubmit(handleLogin)}>
+      <Form onSubmit={handleSubmit(handleLogin)} className="form-container">
         <Form.Group controlId="formBasicEmail">
           <Form.Label>Username</Form.Label>
           <Form.Control
             type="text"
             placeholder="Enter username"
             {...register("userName")}
+            className="form-input"
           />
           {errors.userName && (
             <Form.Text className="text-danger">
@@ -51,6 +53,7 @@ const Login = () => {
             type="password"
             placeholder="Password"
             {...register("password")}
+            className="form-input"
           />
           {errors.password && (
             <Form.Text className="text-danger">
@@ -63,7 +66,7 @@ const Login = () => {
           Login
         </Button>
       </Form>
-      <p>
+      <p className="register-link">
         Don’t have an account yet? <Link to="/register">Register</Link>
       </p>
     </div>

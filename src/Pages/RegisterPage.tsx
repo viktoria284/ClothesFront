@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Form, Button } from "react-bootstrap";
 import { useAuth } from "../Context/AuthContext";
+import "./LoginRegister.css";
 
 type RegisterFormsInputs = {
   email: string;
@@ -13,7 +14,13 @@ type RegisterFormsInputs = {
 const validation = Yup.object().shape({
   email: Yup.string().required("Email is required"),
   userName: Yup.string().required("Username is required"),
-  password: Yup.string().required("Password is required"),
+  password: Yup.string()
+    .required("Password is required")
+    .min(8, "Password must be at least 8 characters")
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+      "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+    ),
 });
 
 const Register = () => {
@@ -28,15 +35,16 @@ const Register = () => {
     registerUser(form.email, form.userName, form.password);
   };
   return (
-    <div>
+    <div className="login-container">
       <h2>Sign in to your account</h2>
-      <Form onSubmit={handleSubmit(handleLogin)}>
+      <Form onSubmit={handleSubmit(handleLogin)} className="form-container">
         <Form.Group controlId="formBasicEmail">
           <Form.Label>Email address</Form.Label>
           <Form.Control
             type="email"
             placeholder="Enter email"
             {...register("email")}
+            className="form-input"
           />
           {errors.email && (
             <Form.Text className="text-danger">
@@ -51,6 +59,7 @@ const Register = () => {
             type="text"
             placeholder="Enter username"
             {...register("userName")}
+            className="form-input"
           />
           {errors.userName && (
             <Form.Text className="text-danger">
@@ -65,6 +74,7 @@ const Register = () => {
             type="password"
             placeholder="Password"
             {...register("password")}
+            className="form-input"
           />
           {errors.password && (
             <Form.Text className="text-danger">
