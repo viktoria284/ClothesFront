@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { UserProfileToken } from '../Models/User';
 import { loginAPI, registerAPI } from '../Services/AuthService';
+import { RootState } from './Store';
 
 interface AuthState {
   user: UserProfileToken | null;
@@ -98,5 +99,5 @@ const authSlice = createSlice({
 });
 
 export const { logout, loadUserFromStorage } = authSlice.actions;
-
+export const selectAuth = (state: RootState) => state.auth;
 export default authSlice.reducer;

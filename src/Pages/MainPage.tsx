@@ -2,12 +2,14 @@ import '../styles.css';
 import CardList, { Product } from '../Components/CardList';
 import '../Components/CardList.css';
 import { useState } from 'react';
+import MyNavbar from '../Components/Navbar';
 
 const MainPage = () => {
   const [loadedProducts, setLoadedProducts] = useState<Product[]>([]);
   
   return (
     <div>
+      <MyNavbar />
       <div className='mainPage'>
         <div className='container'>
           <div className="main-title">

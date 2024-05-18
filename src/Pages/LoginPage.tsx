@@ -75,7 +75,7 @@ const Login = () => {
         </Form.Group>
           
         <Button variant="primary" type="submit" disabled={status === 'loading'}>
-          {status === 'loading' ? 'Logging in...' : 'Login'}
+          {status === 'loading' ? 'Signing In...' : 'Sign In'}
         </Button>
       </Form>
       <p className="register-link">
