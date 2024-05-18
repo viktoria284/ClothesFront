@@ -1,10 +1,13 @@
 import * as Yup from "yup";
 import { Form, Button } from "react-bootstrap";
-import { useAuth } from "../Context/AuthContext";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./LoginRegister.css";
+import { RootState } from "../Store/Store";
+import { loginUser } from "../Store/AuthSlice";
+import { useAppDispatch, useAppSelector } from "../Store/Hooks";
+import { useEffect } from "react";
 
 type LoginFormsInputs = {
   userName: string;
@@ -17,7 +20,10 @@ const validation = Yup.object().shape({
 });
 
 const Login = () => {
-  const { loginUser } = useAuth();
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { status, error } = useAppSelector((state: RootState) => state.auth);
+  
   const {
     register,
     handleSubmit,
@@ -25,12 +31,18 @@ const Login = () => {
   } = useForm<LoginFormsInputs>({ resolver: yupResolver(validation) });
 
   const handleLogin = (form: LoginFormsInputs) => {
-    loginUser(form.userName, form.password);
+    dispatch(loginUser({ username: form.userName, password: form.password }));
   };
+
+  useEffect(() => {
+    if (status === 'succeeded') {
+      navigate("/");
+    }
+  }, [status, navigate]);
 
   return (
     <div className="login-container">
-      <h2>Login</h2>
+      <h2>Log In</h2>
       <Form onSubmit={handleSubmit(handleLogin)} className="form-container">
         <Form.Group controlId="formBasicEmail">
           <Form.Label>Username</Form.Label>
@@ -62,13 +74,15 @@ const Login = () => {
           )}
         </Form.Group>
           
-        <Button variant="primary" type="submit">
-          Login
+        <Button variant="primary" type="submit" disabled={status === 'loading'}>
+          {status === 'loading' ? 'Logging in...' : 'Login'}
         </Button>
       </Form>
       <p className="register-link">
         Don’t have an account yet? <Link to="/register">Register</Link>
       </p>
+      {status === 'loading' && <p>Loading...</p>}
+      {status === 'failed' && <p className="text-danger">{error}</p>}
     </div>
   );
 };
