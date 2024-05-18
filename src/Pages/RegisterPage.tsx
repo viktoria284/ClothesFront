@@ -6,8 +6,8 @@ import "./LoginRegister.css";
 import { registerUser } from "../Store/AuthSlice";
 import { useAppDispatch, useAppSelector } from "../Store/Hooks";
 import { RootState } from "../Store/Store";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 type RegisterFormsInputs = {
   email: string;
@@ -21,16 +21,16 @@ const validation = Yup.object().shape({
   password: Yup.string()
     .required("Password is required")
     .min(8, "Password must be at least 8 characters")
-    .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-      "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
-    ),
+    .matches(/[a-z]/, "Password must contain at least one lowercase letter")
+    .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .matches(/\d/, "Password must contain at least one number")
+    .matches(/[@$!%*?&]/, "Password must contain at least one special character (@$!%*?&)")
 });
 
 const Register = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { status, error } = useAppSelector((state: RootState) => state.auth);
+  const { status } = useAppSelector((state: RootState) => state.auth);
   
   const {
     register,
@@ -50,7 +50,7 @@ const Register = () => {
 
   return (
     <div className="login-container">
-      <h2>Sign in to your account</h2>
+      <h2>Sign Up</h2>
       <Form onSubmit={handleSubmit(handleRegister)} className="form-container">
         <Form.Group controlId="formBasicEmail">
           <Form.Label>Email address</Form.Label>
@@ -98,11 +98,12 @@ const Register = () => {
         </Form.Group>
 
         <Button variant="primary" type="submit" disabled={status === 'loading'}>
-        {status === 'loading' ? 'Registering...' : 'Sign Up'}
+        {status === 'loading' ? 'Signing up...' : 'Sign Up'}
         </Button>
       </Form>
-      {status === 'loading' && <p>Loading...</p>}
-      {status === 'failed' && <p className="text-danger">{error}</p>}
+      <p className="register-link">
+        Already have an account? <Link to="/login">Sign In</Link>
+      </p>
     </div>
   );
 };

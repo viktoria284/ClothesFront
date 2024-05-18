@@ -4,14 +4,18 @@ import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import './CardList.css';
 
-interface Product {
+export interface Product {
     productId: number;
     productName: string;
     description: string;
     imageData: string;
 }
 
-function CardList() {
+interface CardListProps {
+  onProductsLoaded: (products: Product[]) => void;
+}
+
+function CardList({ onProductsLoaded }: CardListProps) {
     const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
@@ -20,11 +24,12 @@ function CardList() {
       .then(data => {
         console.log('Products:', data);
         setProducts(data);
+        onProductsLoaded(data);
       })
       .catch(error => {
         console.error('Error fetching products:', error);
       });
-  }, []);
+  }, [onProductsLoaded]);
 
 
   return (

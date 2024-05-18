@@ -22,7 +22,7 @@ const validation = Yup.object().shape({
 const Login = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { status, error } = useAppSelector((state: RootState) => state.auth);
+  const { status } = useAppSelector((state: RootState) => state.auth);
   
   const {
     register,
@@ -42,7 +42,7 @@ const Login = () => {
 
   return (
     <div className="login-container">
-      <h2>Log In</h2>
+      <h2>Sign In</h2>
       <Form onSubmit={handleSubmit(handleLogin)} className="form-container">
         <Form.Group controlId="formBasicEmail">
           <Form.Label>Username</Form.Label>
@@ -79,10 +79,8 @@ const Login = () => {
         </Button>
       </Form>
       <p className="register-link">
-        Don’t have an account yet? <Link to="/register">Register</Link>
+        Don’t have an account yet? <Link to="/register">Sign Up</Link>
       </p>
-      {status === 'loading' && <p>Loading...</p>}
-      {status === 'failed' && <p className="text-danger">{error}</p>}
     </div>
   );
 };
