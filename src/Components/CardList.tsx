@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import './CardList.css';
+import { Link } from 'react-router-dom';
 
 export interface Product {
     productId: number;
@@ -42,7 +43,9 @@ function CardList({ onProductsLoaded }: CardListProps) {
                 <Card.Body>
                     <Card.Title>{product.productName}</Card.Title>
                     <Card.Text>{product.description}</Card.Text>
-                    <Button variant="primary">Go somewhere</Button>
+                    <Link to={`/product/${product.productId}`}>
+                      <Button variant="primary">View Product</Button>
+                    </Link>
                 </Card.Body>
             </Card>
         ))}
