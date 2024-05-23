@@ -9,7 +9,8 @@ export interface Product {
     productId: number;
     productName: string;
     description: string;
-    imageData: string;
+    image: string;
+    price: number; 
 }
 
 interface CardListProps {
@@ -20,7 +21,7 @@ function CardList({ onProductsLoaded }: CardListProps) {
     const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    fetch('https://localhost:7200/api/Products/wImages')
+    fetch('https://localhost:7200/api/products/wImage')
       .then(response => response.json())
       .then(data => {
         console.log('Products:', data);
@@ -38,14 +39,17 @@ function CardList({ onProductsLoaded }: CardListProps) {
         {products.map(product => (
             <Card key={product.productId} style={{ width: '18rem' }}>
                 <div className="card-img-container">
-                  <Card.Img variant="top" src={`data:image/jpeg;base64,${product.imageData}`} />
+                  <Card.Img variant="top" src={`data:image/jpeg;base64,${product.image}`} />
                 </div>
                 <Card.Body>
+                  <div className="card-header">
                     <Card.Title>{product.productName}</Card.Title>
-                    <Card.Text>{product.description}</Card.Text>
-                    <Link to={`/product/${product.productId}`}>
+                    <Card.Text className="price">${product.price.toFixed(2)}</Card.Text>
+                  </div>
+                  <Card.Text>{product.description}</Card.Text>
+                  <Link to={`/product/${product.productId}`}>
                       <Button variant="primary">View Product</Button>
-                    </Link>
+                  </Link>
                 </Card.Body>
             </Card>
         ))}

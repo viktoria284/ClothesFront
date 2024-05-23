@@ -4,15 +4,18 @@ import { loginAPI, registerAPI } from '../Services/AuthService';
 import { RootState } from './Store';
 
 interface AuthState {
-  user: UserProfileToken | null;
-  token: string | null;
-  status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  user: {
+    userName: string;
+    email: string;
+    token: string;
+    userId: string;
+  } | null;
+  status: 'succeeded' | 'idle' | 'loading' | 'failed';
   error: string | null;
 }
 
 const initialState: AuthState = {
   user: null,
-  token: null,
   status: 'idle',
   error: null,
 };
@@ -52,16 +55,13 @@ const authSlice = createSlice({
   reducers: {
     logout(state) {
       state.user = null;
-      state.token = null;
+      state.error = null;
       localStorage.removeItem('user');
-      localStorage.removeItem('token');
     },
     loadUserFromStorage(state) {
       const user = localStorage.getItem('user');
-      const token = localStorage.getItem('token');
-      if (user && token) {
+      if (user) {
         state.user = JSON.parse(user);
-        state.token = token;
       }
     },
   },
@@ -73,9 +73,8 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.user = action.payload;
-        state.token = action.payload.token;
+        state.error = null;
         localStorage.setItem('user', JSON.stringify(action.payload));
-        localStorage.setItem('token', action.payload.token);
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.status = 'failed';
@@ -87,9 +86,8 @@ const authSlice = createSlice({
       .addCase(registerUser.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.user = action.payload;
-        state.token = action.payload.token;
+        state.error = null;
         localStorage.setItem('user', JSON.stringify(action.payload));
-        localStorage.setItem('token', action.payload.token);
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.status = 'failed';

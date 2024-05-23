@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Image, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
 import './ProductPage.css';
+import { useAppSelector } from '../Store/Hooks';
+import MyNavbar from '../Components/Navbar';
 
 interface ProductVariant {
   productVariantId: string;
-  color: string;
   size: string;
   stockQuantity: number;
 }
@@ -15,6 +16,7 @@ interface Product {
   productId: number;
   productName: string;
   description: string;
+  color: string;
   price: number;
   images: string[];
   variants: ProductVariant[];
@@ -22,9 +24,11 @@ interface Product {
 
 const ProductPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
-  const [selectedColor, setSelectedColor] = useState<string>('');
   const [selectedSize, setSelectedSize] = useState<string>('');
+  const [quantity, setQuantity] = useState<number>(0);
+  const user = useAppSelector((state: any) => state.auth.user);
 
   useEffect(() => {
     axios.get(`https://localhost:7200/api/products/${id}`)
@@ -37,14 +41,29 @@ const ProductPage: React.FC = () => {
   }, [id]);
 
   const handleAddToCart = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    const productVariant = product!.variants.find(v => v.size === selectedSize);
+    if (!productVariant) {
+      alert('Selected size is not available.');
+      return;
+    }
+    
     const cartItem = {
-      productId: product!.productId,
-      productVariantId: product!.variants.find(v => v.color === selectedColor && v.size === selectedSize)!.productVariantId,
-      quantity: 1, // Assuming 1 item for simplicity
+      userId: user.userId,
+      productVariantId: productVariant.productVariantId,
+      size: selectedSize,
+      quantity,
       price: product!.price,
     };
 
-    axios.post('https://localhost:7200/api/cart', cartItem)
+    console.log('User:', user);
+    console.log('Cart Item to be sent:', cartItem);
+
+    axios.post('https://localhost:7200/api/cart/toCart', cartItem)
       .then(response => {
         alert('Product added to cart!');
       })
@@ -53,14 +72,22 @@ const ProductPage: React.FC = () => {
       });
   };
 
+  const handleQuantityChange = (delta: number) => {
+    setQuantity(prevQuantity => {
+      const newQuantity = prevQuantity + delta;
+      return newQuantity < 1 ? 1 : newQuantity;
+    });
+  };
+
   if (!product) {
     return <div>Loading...</div>;
   }
 
-  const availableColors = product ? Array.from(new Set((product.variants || []).map(v => v.color))) : [];
-  const availableSizes = selectedColor && product ? (product.variants || []).filter(v => v.color === selectedColor).map(v => v.size) : [];
-  
+  const availableSizes = product.variants.map(variant => variant.size);
+
   return (
+    <div>
+    <MyNavbar />
     <Container className="product-page">
       <Row>
         <Col md={6}>
@@ -74,31 +101,28 @@ const ProductPage: React.FC = () => {
           <p>{product.description}</p>
           <h2>${product.price}</h2>
           <Form>
-            <Form.Group controlId="colorSelect">
-              <Form.Label>Color</Form.Label>
-              <Form.Control as="select" value={selectedColor} onChange={e => setSelectedColor(e.target.value)}>
-                <option value="">Select a color</option>
-                {availableColors.map(color => (
-                  <option key={color} value={color}>{color}</option>
-                ))}
-              </Form.Control>
-            </Form.Group>
             <Form.Group controlId="sizeSelect">
               <Form.Label>Size</Form.Label>
-              <Form.Control as="select" value={selectedSize} onChange={e => setSelectedSize(e.target.value)} disabled={!selectedColor}>
+              <Form.Control as="select" value={selectedSize} onChange={e => setSelectedSize(e.target.value)}>
                 <option value="">Select a size</option>
                 {availableSizes.map(size => (
                   <option key={size} value={size}>{size}</option>
                 ))}
               </Form.Control>
             </Form.Group>
-            <Button variant="primary" onClick={handleAddToCart} disabled={!selectedColor || !selectedSize}>
+            <div className="quantity-control">
+              <Button variant="outline-primary" onClick={() => handleQuantityChange(-1)}>-</Button>
+              <span className="quantity">{quantity}</span>
+              <Button variant="outline-primary" onClick={() => handleQuantityChange(1)}>+</Button>
+            </div>
+            <Button variant="primary" onClick={handleAddToCart} disabled={!selectedSize}>
               Add to Cart
             </Button>
           </Form>
         </Col>
       </Row>
     </Container>
+    </div>
   );
 };
 
