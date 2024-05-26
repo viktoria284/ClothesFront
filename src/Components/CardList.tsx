@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 export interface Product {
     productId: number;
     productName: string;
-    description: string;
+    /*description: string;*/
     image: string;
     price: number; 
 }
@@ -44,9 +44,9 @@ function CardList({ onProductsLoaded }: CardListProps) {
                 <Card.Body>
                   <div className="card-header">
                     <Card.Title>{product.productName}</Card.Title>
-                    <Card.Text className="price">${product.price.toFixed(2)}</Card.Text>
                   </div>
-                  <Card.Text>{product.description}</Card.Text>
+                  {/* <Card.Text>{product.description}</Card.Text> */}
+                  <Card.Text className="price">${product.price.toFixed(2)}</Card.Text>
                   <Link to={`/product/${product.productId}`}>
                       <Button variant="primary">View Product</Button>
                   </Link>
