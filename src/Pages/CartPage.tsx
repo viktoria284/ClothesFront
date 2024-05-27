@@ -47,41 +47,28 @@ const CartPage: React.FC = () => {
       const newQuantity = item.quantity + change;
       if (newQuantity < 1) return;
   
-      // Проверка доступного количества на складе
       axios.get(`https://localhost:7200/api/cart/productVariant/${item.productVariantId}`)
-        .then(response => {
-          const availableStock = response.data.stockQuantity;
-          if (availableStock < 1) { ////проблемы!!!!!
-            alert('Not enough stock available');
-            return;
+      .then(response => {
+        const availableStock = response.data.stockQuantity;
+
+        if (newQuantity > availableStock) {
+          alert('Not enough stock available');
+          return;
+        }
+
+        setCartItems(cartItems.map(item => {
+          if (item.cartItemId === cartItemId) {
+            return { ...item, quantity: newQuantity };
           }
-  
-          // Отправка запроса на изменение количества
-          axios.put(`https://localhost:7200/api/cart/quantity/${cartItemId}`, newQuantity, {
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          })
-          .then(response => {
-            console.log('Quantity update response:', response.data);
-            setCartItems(cartItems.map(item => {
-              if (item.cartItemId === cartItemId) {
-                return { ...item, quantity: newQuantity };
-              }
-              return item;
-            }));
-          })
-          .catch(error => {
-            console.error('Error updating quantity:', error);
-            alert('Error updating quantity: ' + error.message);
-          });
-        })
-        .catch(error => {
-          console.error('Error fetching stock quantity:', error);
-          alert('Error fetching stock quantity: ' + error.message);
-        });
-    }
-  };
+          return item;
+        }));
+      })
+      .catch(error => {
+        console.error('Error fetching stock quantity:', error);
+        alert('Error fetching stock quantity: ' + error.message);
+      });
+  }
+};
   
 
   return (
@@ -91,7 +78,7 @@ const CartPage: React.FC = () => {
         <h1>Your Cart</h1>
         <Row className="card-list">
           {cartItems.map(item => (
-            <Card key={item.cartItemId} className="cart-card">
+            <Card key={item.cartItemId} className="product-card">
               <div className="card-img-container">
                 <Card.Img variant="top" src={`data:image/jpeg;base64,${item.image}`} />
               </div>
