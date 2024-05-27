@@ -4,10 +4,12 @@ import axios from 'axios';
 import './CartPage.css';
 import { useAppSelector } from '../Store/Hooks';
 import MyNavbar from '../Components/Navbar';
+import { Link } from 'react-router-dom';
 
 interface CartItem {
   cartItemId: string;
   productVariantId: string;
+  productId: string;
   productName: string;
   image: string;
   size: string;
@@ -75,7 +77,18 @@ const CartPage: React.FC = () => {
     <div>
       <MyNavbar />
       <Container className="cart-page">
-        <h1>Your Cart</h1>
+        <div className="main-title">
+          <h1>Your Cart</h1>
+        </div>
+        {cartItems.length === 0 ? (
+          <div className="empty-cart-message">
+            <h2>Your cart is currently empty.</h2>
+            <p>Don't be shy! Add something here!</p>
+            <Link to="/">
+              <Button variant="primary">Go Shopping</Button>
+            </Link>
+          </div>
+        ) : (
         <Row className="card-list">
           {cartItems.map(item => (
             <Card key={item.cartItemId} className="product-card">
@@ -83,21 +96,24 @@ const CartPage: React.FC = () => {
                 <Card.Img variant="top" src={`data:image/jpeg;base64,${item.image}`} />
               </div>
               <Card.Body>
-                <div className="card-header">
-                  <Card.Title>{item.productName}</Card.Title>
-                  <Card.Text className="price">${item.price.toFixed(2)}</Card.Text>
-                </div>
+                <Link to={`/product/${item.productId}`} className="product-link">
+                  <Card.Title className="product-name">{item.productName}</Card.Title>
+                </Link>
                 <Card.Text>Size: {item.size}</Card.Text>
-                <div className="quantity-control">
-                  <Button variant="outline-primary" onClick={() => handleQuantityChange(item.cartItemId, -1)} disabled={item.quantity <= 1}>-</Button>
-                  <span className="quantity">{item.quantity}</span>
-                  <Button variant="outline-primary" onClick={() => handleQuantityChange(item.cartItemId, 1)}>+</Button>
+                <Card.Text className="price">${item.price.toFixed(2)}</Card.Text>
+                <div className="quantity-remove-container">
+                  <div className="quantity-control">
+                    <Button variant="outline-primary" onClick={() => handleQuantityChange(item.cartItemId, -1)} disabled={item.quantity <= 1}>-</Button>
+                    <span className="quantity">{item.quantity}</span>
+                    <Button variant="outline-primary" onClick={() => handleQuantityChange(item.cartItemId, 1)}>+</Button>
+                  </div>
+                  <Button variant="danger" onClick={() => handleRemoveFromCart(item.cartItemId)}>Remove</Button>
                 </div>
-                <Button variant="danger" onClick={() => handleRemoveFromCart(item.cartItemId)}>Remove</Button>
               </Card.Body>
             </Card>
           ))}
         </Row>
+        )}
       </Container>
     </div>
   );

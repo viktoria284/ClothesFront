@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
+import './CardList.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
-import './CardList.css';
 import { Link } from 'react-router-dom';
 
 export interface Product {
@@ -37,20 +37,16 @@ function CardList({ onProductsLoaded }: CardListProps) {
   return (
     <div className="card-list">
         {products.map(product => (
-            <Card key={product.productId} style={{ width: '18rem' }}>
+            <Card key={product.productId}  className="product-card">
                 <div className="card-img-container">
                   <Card.Img variant="top" src={`data:image/jpeg;base64,${product.image}`} />
                 </div>
+                <Link to={`/product/${product.productId}`} className="product-link">
                 <Card.Body>
-                  <div className="card-header">
-                    <Card.Title>{product.productName}</Card.Title>
-                  </div>
-                  {/* <Card.Text>{product.description}</Card.Text> */}
+                  <Card.Title className="product-name">{product.productName}</Card.Title>
                   <Card.Text className="price">${product.price.toFixed(2)}</Card.Text>
-                  <Link to={`/product/${product.productId}`}>
-                      <Button variant="primary">View Product</Button>
-                  </Link>
                 </Card.Body>
+              </Link>
             </Card>
         ))}
     </div>
