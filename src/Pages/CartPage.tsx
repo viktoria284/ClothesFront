@@ -42,13 +42,47 @@ const CartPage: React.FC = () => {
   };
 
   const handleQuantityChange = (cartItemId: string, change: number) => {
-    setCartItems(cartItems.map(item => {
-      if (item.cartItemId === cartItemId) {
-        return { ...item, quantity: item.quantity + change };
-      }
-      return item;
-    }));
+    const item = cartItems.find(item => item.cartItemId === cartItemId);
+    if (item) {
+      const newQuantity = item.quantity + change;
+      if (newQuantity < 1) return;
+  
+      // Проверка доступного количества на складе
+      axios.get(`https://localhost:7200/api/cart/productVariant/${item.productVariantId}`)
+        .then(response => {
+          const availableStock = response.data.stockQuantity;
+          if (availableStock < 1) { ////проблемы!!!!!
+            alert('Not enough stock available');
+            return;
+          }
+  
+          // Отправка запроса на изменение количества
+          axios.put(`https://localhost:7200/api/cart/quantity/${cartItemId}`, newQuantity, {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(response => {
+            console.log('Quantity update response:', response.data);
+            setCartItems(cartItems.map(item => {
+              if (item.cartItemId === cartItemId) {
+                return { ...item, quantity: newQuantity };
+              }
+              return item;
+            }));
+          })
+          .catch(error => {
+            console.error('Error updating quantity:', error);
+            alert('Error updating quantity: ' + error.message);
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching stock quantity:', error);
+          alert('Error fetching stock quantity: ' + error.message);
+        });
+    }
   };
+  
 
   return (
     <div>

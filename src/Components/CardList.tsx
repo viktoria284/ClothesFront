@@ -21,7 +21,7 @@ function CardList({ onProductsLoaded }: CardListProps) {
     const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    fetch('https://localhost:7200/api/products/wImage')
+    fetch('https://localhost:7200/api/products/forCard')
       .then(response => response.json())
       .then(data => {
         console.log('Products:', data);
