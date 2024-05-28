@@ -41,7 +41,7 @@ const ProductPage: React.FC = () => {
       });
   }, [id]);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!user) {
       navigate('/login');
       return;
@@ -57,21 +57,34 @@ const ProductPage: React.FC = () => {
       return;
     }
     
-    const cartItem = {
-      userId: user.userId,
-      productVariantId: productVariant.productVariantId,
-      size: selectedSize,
-      quantity,
-    };
-
-    axios.post('https://localhost:7200/api/cart/toCart', cartItem)
-      .then(response => {
-        setMessage('Product added to cart!');
-      })
-      .catch(error => {
-        console.error('Error adding product to cart:', error);
-        setMessage('Error adding product to cart.');
+    try {
+      const response = await axios.get(`https://localhost:7200/api/cart/checkItem`, {
+        params: {
+          userId: user.userId,
+          productVariantId: productVariant.productVariantId
+        }
       });
+      const isExistingItem = response.data;
+
+      if (isExistingItem) {
+        await axios.put('https://localhost:7200/api/cart/updateCartItem', {
+          userId: user.userId,
+          productVariantId: productVariant.productVariantId,
+          quantity
+        });
+      } else {
+          await axios.post('https://localhost:7200/api/cart/toCart', {
+          userId: user.userId,
+          productVariantId: productVariant.productVariantId,
+          size: selectedSize,
+          quantity
+        });
+      }
+      setMessage('Product added to cart!');
+    } catch (error) {
+      console.error('Error adding product to cart:', error);
+      setMessage('Error adding product to cart.');
+    }
   };
 
   const handleQuantityChange = (delta: number) => {

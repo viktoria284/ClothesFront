@@ -58,12 +58,23 @@ const CartPage: React.FC = () => {
           return;
         }
 
-        setCartItems(cartItems.map(item => {
-          if (item.cartItemId === cartItemId) {
-            return { ...item, quantity: newQuantity };
-          }
-          return item;
-        }));
+        axios.put(`https://localhost:7200/api/cart/${item.cartItemId}`, {
+          userId: userId,
+          productVariantId: item.productVariantId,
+          quantity: newQuantity
+        })
+          .then(response => {
+            setCartItems(cartItems.map(item => {
+              if (item.cartItemId === cartItemId) {
+                return { ...item, quantity: newQuantity };
+              }
+              return item;
+            }));
+          })
+          .catch(error => {
+            console.error('Error updating cart item:', error);
+            alert('Error updating cart item: ' + error.message);
+          });
       })
       .catch(error => {
         console.error('Error fetching stock quantity:', error);

@@ -16,3 +16,16 @@
 .navbar-text a:hover {
   text-decoration: underline;
 }
+
+.search-form {
+  margin-right: 60px;
+}
+
+.search-input {
+  margin-right: 15px;
+  width: 350px;
+}
+
+.search-button {
+  width: 80px;
+}
